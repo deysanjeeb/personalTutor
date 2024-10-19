@@ -8,6 +8,7 @@ This FastAPI-based service is designed to handle PDF file uploads, extract conte
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Installation](#installation)
+- [Running](#running)
 
 ---
 
@@ -16,7 +17,6 @@ This FastAPI-based service is designed to handle PDF file uploads, extract conte
 2. **QnA Generation**: Uses an LLM (LLaMA-3 model from Ollama) to generate question-answer pairs based on the extracted text.
 3. **Embeddings and Storage**: Extracted QnA pairs are converted into embeddings and stored in a ChromaDB persistent database.
 4. **Chat Functionality**: Allows users to send chat requests and receive responses using the LLaMA-3 model and the previously stored QnA data.
-5. **Streamlit Integration**: Though Streamlit is imported, it's currently not in use in the app.
 
 ---
 
@@ -54,4 +54,13 @@ This FastAPI-based service is designed to handle PDF file uploads, extract conte
     ```bash
     GROQ_API_KEY=<your_groq_api_key>
     OLLAMA_API_KEY=<your_ollama_api_key>
+    ```
+
+3. Install [https://ollama.com/download](Ollama)
+
+## Running
+
+    ```bash
+    ollama serve
+    python api.py
     ```
