@@ -1,0 +1,9 @@
+fastapi
+pypdf
+pydantic
+transformers
+groq
+streamlit
+python-dotenv
+chromadb
+ollama
