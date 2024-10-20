@@ -22,6 +22,9 @@ vectara_customer_id = os.getenv('VECTARA_CUSTOMER_ID')
 app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
 
+
+
+
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
