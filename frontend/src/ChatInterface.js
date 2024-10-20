@@ -60,7 +60,8 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://0.0.0.0:3001/upload-pdf', {
+      const response = await fetch('http://0.0.0.0:3001/upload', {
+      // const response = await fetch('http://0.0.0.0:3001/upload-pdf', {
         method: 'POST',
         body: formData,
       });
