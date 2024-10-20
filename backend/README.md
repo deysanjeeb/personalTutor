@@ -56,7 +56,7 @@ This FastAPI-based service is designed to handle PDF file uploads, extract conte
     OLLAMA_API_KEY=<your_ollama_api_key>
     ```
 
-3. Install [https://ollama.com/download](Ollama)
+3. Install [https://ollama.com/download](https://ollama.com/download)
 
 ## Running
 
