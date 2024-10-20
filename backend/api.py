@@ -354,6 +354,53 @@ async def vidStat():
     response = requests.get(url, headers=headers)
     print(response.json())
 
+
+@app.post("/query")
+async def query(chat_request: ChatRequest):
+    qry = chat_request.message
+    url = "https://api.vectara.io/v2/corpora/test-one/query"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "x-api-key": "zwt__A9TkSLGev9kR3RRGyDiX5NihZzN79GQHRLygw"
+    }
+
+    payload = {
+        "query": qry,
+        "stream_response": False,
+        "search": {
+            "offset": 0,
+            "limit": 20,
+            "context_configuration": {
+                "sentences_before": 3,
+                "sentences_after": 3,
+                "start_tag": "<b>",
+                "end_tag": "</b>"
+            },
+            "metadata_filter": "part.lang = 'eng'",
+            "lexical_interpolation": 0.1,
+            "semantics": "default"
+        },
+        "generation": {
+            "max_used_search_results": 5,
+            "response_language": "eng"
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the JSON response
+        data = response.json()
+        print(json.dumps(data, indent=2))
+        return data
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3001)
