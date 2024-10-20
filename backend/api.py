@@ -305,12 +305,6 @@ async def upload_pdf_file(file: UploadFile = File(...)):
     # return response
 
 
-import requests
-
-
-
-
-
 @app.get("/vidGen")
 # async def vidGen(request: urls):
 async def vidGen():
@@ -320,6 +314,7 @@ async def vidGen():
         "authorization": f"Bearer {infinity_api}",
         "content-type": "application/json"
     }
+    print(headers)
     data = {
         "resolution": "320",
         "crop_head": False,
@@ -329,6 +324,7 @@ async def vidGen():
     }
     response = requests.post(url, headers=headers, json=data)
     print(response.json())
+
 
 # @app.post("/vidGen")
 # async def vidGen(request: urls):
@@ -348,6 +344,15 @@ async def vidGen():
 #     response = requests.post(url, headers=headers, json=data)
 #     print(response.json())
 
+@app.get("/vidStat")
+async def vidStat():
+    url = "https://studio.infinity.ai/api/v2/generations/116facc9-0366-4ec3-9d46-76c96c7de397"
+    headers = {
+        "authorization": f"Bearer {infinity_api}"
+    }
+
+    response = requests.get(url, headers=headers)
+    print(response.json())
 
 if __name__ == "__main__":
     import uvicorn
