@@ -6,3 +6,4 @@ groq
 python-dotenv
 chromadb
 ollama
+python-multipart

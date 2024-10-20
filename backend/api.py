@@ -6,7 +6,6 @@ from pypdf import PdfReader
 from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from groq import Groq
-import streamlit as st
 from dotenv import load_dotenv
 from time import sleep
 import os
@@ -21,6 +20,9 @@ print(api_key)
 
 app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
+
+
+
 
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
@@ -287,6 +289,10 @@ async def upload_pdf(file: UploadFile = File(...)):
         return JSONResponse(content={"message": "PDF uploaded successfully", "file_path": file_location})
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.post("/vidGen")
+async def chat(request: ChatRequest):
+
 
 if __name__ == "__main__":
     import uvicorn
