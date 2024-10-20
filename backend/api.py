@@ -13,6 +13,7 @@ import os
 import chromadb
 import re
 import ollama
+import requests
 
 load_dotenv()
 api_key = os.getenv('GROQ_API_KEY')
@@ -32,6 +33,85 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+
+def upload_pdf_file(customer_id, corpus_id, file_path, api_key):
+    """
+    Uploads a PDF file to the Vectara API.
+
+    Parameters:
+    - customer_id (str): The ID of the customer.
+    - corpus_id (str): The ID of the corpus to which the file belongs.
+    - file_path (str): The path to the PDF file to upload.
+    - api_key (str): The API key for authentication.
+    """
+
+    url = f"https://api.vectara.io/v1/upload?c={customer_id}&o={corpus_id}"
+
+    post_headers = { 
+        "x-api-key": api_key,
+        "customer-id": str(customer_id)
+    }
+    files = {
+        "file": (file_path, open(file_path, 'rb')),
+    }  
+    response = requests.post(url, files=files, verify=True, headers=post_headers)
+
+    if response.status_code == 200:
+        print("File uploaded successfully")
+    else:
+        print(f"Error uploading file: {response.text}")
+
+    return response
+
+
+def query_response(query_str, customer_id, corpus_id, api_key, n=3):
+    """
+    Sends a query to the Vectara API and retrieves results.
+
+    Parameters:
+    - query_str (str): The query string to search.
+    - customer_id (str): The ID of the customer associated with the query.
+    - corpus_id (str): The ID of the corpus to query.
+    - api_key (str): The API key for authentication.
+    - n (int, optional): The number of top results to retrieve (default is 3).
+
+    Returns:
+    - dict: The response from the API containing the search results.
+    """
+
+    url = "https://api.vectara.io/v1/query"
+
+    payload = json.dumps({
+    "query": [
+        {
+          "query": query_str,
+          "start": 0,
+          "numResults": 10,
+          "contextConfig": {
+            "sentencesBefore": 0,
+            "sentencesAfter": 0
+          },
+          "corpusKey": [
+            {
+              "customerId": customer_id,
+              "corpusId": corpus_id
+            }
+          ],
+        }
+      ]
+    })
+
+    headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'x-api-key': api_key
+    }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    res = response.json()
+
+    return res
+
 
 # Load model and tokenizer
 groq = Groq(api_key=api_key)
