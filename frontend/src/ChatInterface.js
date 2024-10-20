@@ -9,10 +9,13 @@ const ChatInterface = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const [isChecked, setIsChecked] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  
 
   useEffect(scrollToBottom, [messages]);
 
@@ -26,12 +29,12 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://0.0.0.0:3001/chat', {
+      const response = await fetch('http://0.0.0.0:3001/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input,isChecked: isChecked }),
       });
 
       if (!response.ok) {
@@ -39,7 +42,7 @@ const ChatInterface = () => {
       }
 
       const data = await response.json();
-      const botMessage = { text: data.response, sender: 'bot' };
+      const botMessage = { text: data.summary, sender: 'bot' };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error:', error);
@@ -164,13 +167,21 @@ const ChatInterface = () => {
                 placeholder="Type your message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={(e) => setIsChecked(e.target.checked)}
+            className="mr-2"
+          />
             <button
-                type="submit"
-                disabled={isLoading}
-                className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-                <Send size={24} />
-            </button>
+  type="submit"
+  disabled={isLoading}
+  className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+>
+<Send size={24} />
+</button>
+
+
             </div>
         </form>
     </div>

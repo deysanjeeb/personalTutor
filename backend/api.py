@@ -162,6 +162,7 @@ def extractJSON(res):
 
 class ChatRequest(BaseModel):
     message: str
+    isChecked: bool
 
 class urls(BaseModel):
     imgURL: str
@@ -358,6 +359,8 @@ async def vidStat():
 @app.post("/query")
 async def query(chat_request: ChatRequest):
     qry = chat_request.message
+    isVid = chat_request.isChecked
+    print(isVid)
     url = "https://api.vectara.io/v2/corpora/test-one/query"
 
     headers = {
@@ -384,7 +387,7 @@ async def query(chat_request: ChatRequest):
         },
         "generation": {
             "max_used_search_results": 5,
-            "response_language": "eng"
+            "response_language": "auto"
         }
     }
 
