@@ -129,7 +129,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
+env/.env backend/api.py frontend/src/ChatInterface.js .gitignore
 venv/
 ENV/
 env.bak/

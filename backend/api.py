@@ -19,10 +19,9 @@ api_key = os.getenv('GROQ_API_KEY')
 vectara_api = os.getenv('VECTARA_API_KEY')
 vectara_corpus_id = os.getenv('VECTARA_CORPUS_ID')
 vectara_customer_id = os.getenv('VECTARA_CUSTOMER_ID')
+infinity_api = os.getenv('INFINITY_API_KEY')
 app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
-
-
 
 
 # Ensure the upload directory exists
@@ -164,6 +163,10 @@ def extractJSON(res):
 class ChatRequest(BaseModel):
     message: str
 
+class urls(BaseModel):
+    imgURL: str
+    audioURL: str
+
 client = chromadb.PersistentClient(os.getcwd())
 collections = client.list_collections()
 print(collections)
@@ -302,8 +305,48 @@ async def upload_pdf_file(file: UploadFile = File(...)):
     # return response
 
 
+import requests
+
+
+
+
+
+@app.get("/vidGen")
+# async def vidGen(request: urls):
+async def vidGen():
+    url = "https://studio.infinity.ai/api/v2/generate"
+    headers = {
+        "accept": "application/json",
+        "authorization": f"Bearer {infinity_api}",
+        "content-type": "application/json"
+    }
+    data = {
+        "resolution": "320",
+        "crop_head": False,
+        "make_stable": False,
+        "img_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/infantBaby.png",
+        "audio_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/10sec.wav"
+    }
+    response = requests.post(url, headers=headers, json=data)
+    print(response.json())
+
 # @app.post("/vidGen")
-# async def chat(request: ChatRequest):
+# async def vidGen(request: urls):
+#     url = "https://studio.infinity.ai/api/v2/generate"
+#     headers = {
+#         "accept": "application/json",
+#         "authorization": f"Bearer {infinity_api}",
+#         "content-type": "application/json"
+#     }
+#     data = {
+#         "resolution": "320",
+#         "crop_head": False,
+#         "make_stable": False,
+#         "img_url": request.imgURL,
+#         "audio_url": request.audioURL
+#     }
+#     response = requests.post(url, headers=headers, json=data)
+#     print(response.json())
 
 
 if __name__ == "__main__":
