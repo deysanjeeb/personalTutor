@@ -6,7 +6,6 @@ from pypdf import PdfReader
 from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from groq import Groq
-import streamlit as st
 from dotenv import load_dotenv
 from time import sleep
 import os
@@ -17,8 +16,9 @@ import requests
 
 load_dotenv()
 api_key = os.getenv('GROQ_API_KEY')
-print(api_key)
-
+vectara_api = os.getenv('VECTARA_API_KEY')
+vectara_corpus_id = os.getenv('VECTARA_CORPUS_ID')
+vectara_customer_id = os.getenv('VECTARA_CUSTOMER_ID')
 app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
 
@@ -33,36 +33,6 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
-
-def upload_pdf_file(customer_id, corpus_id, file_path, api_key):
-    """
-    Uploads a PDF file to the Vectara API.
-
-    Parameters:
-    - customer_id (str): The ID of the customer.
-    - corpus_id (str): The ID of the corpus to which the file belongs.
-    - file_path (str): The path to the PDF file to upload.
-    - api_key (str): The API key for authentication.
-    """
-
-    url = f"https://api.vectara.io/v1/upload?c={customer_id}&o={corpus_id}"
-
-    post_headers = { 
-        "x-api-key": api_key,
-        "customer-id": str(customer_id)
-    }
-    files = {
-        "file": (file_path, open(file_path, 'rb')),
-    }  
-    response = requests.post(url, files=files, verify=True, headers=post_headers)
-
-    if response.status_code == 200:
-        print("File uploaded successfully")
-    else:
-        print(f"Error uploading file: {response.text}")
-
-    return response
 
 
 def query_response(query_str, customer_id, corpus_id, api_key, n=3):
@@ -287,6 +257,51 @@ async def upload_pdf(file: UploadFile = File(...)):
         return JSONResponse(content={"message": "PDF uploaded successfully", "file_path": file_location})
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.post("/upload")
+async def upload_pdf_file(file: UploadFile = File(...)):
+    """
+    Uploads a PDF file to the Vectara API.
+
+    Parameters:
+    - customer_id (str): The ID of the customer.
+    - corpus_id (str): The ID of the corpus to which the file belongs.
+    - file_path (str): The path to the PDF file to upload.
+    - api_key (str): The API key for authentication.
+    # """
+    # vectara_customer_id
+    # vectara_corpus_id
+    # vectara_api
+    file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
+    with open(file_location, "wb") as f:
+        f.write(await file.read())
+    file_dir = os.path.join(UPLOAD_DIRECTORY, file.filename)
+    url = f"https://api.vectara.io/v1/upload?c={vectara_customer_id}&o={vectara_corpus_id}"
+
+    post_headers = { 
+        "x-api-key": vectara_api,
+        "customer-id": str(vectara_customer_id)
+    }
+    files = {
+        "file": (file_dir, open(file_dir, 'rb')),
+    }  
+    response = requests.post(url, files=files, verify=True, headers=post_headers)
+
+    if response.status_code == 200:
+        print("File uploaded successfully")
+        return JSONResponse(content={"message": "PDF uploaded successfully", "file_path": file_location})
+
+    else:
+        print(f"Error uploading file: {response.text}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+    # return response
+
+
+# @app.post("/vidGen")
+# async def chat(request: ChatRequest):
+
 
 if __name__ == "__main__":
     import uvicorn
