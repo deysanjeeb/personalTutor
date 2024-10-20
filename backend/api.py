@@ -404,6 +404,180 @@ async def query(chat_request: ChatRequest):
         print(response.text)
 
 
+#LAVANYA - PHASE_2
+
+from bs4 import BeautifulSoup
+import requests
+import os
+
+'''
+Getting references
+'''
+
+
+# Define your search query
+query = 'python'
+search_engine = 'https://www.google.com/search'
+
+proxies = {
+    'http': 'http://brd-customer-hl_e62aa94d-zone-datacenter_proxy1:0did46f1tu65@brd.superproxy.io:22225',
+    'https': 'http://brd-customer-hl_e62aa94d-zone-datacenter_proxy1:0did46f1tu65@brd.superproxy.io:22225'
+}
+
+def get_references(query, search_engine, proxies):
+    
+
+    # Headers to avoid being blocked
+    headers = {
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82',
+    }
+    
+    # Search query parameters
+    parameters = {'q': query}
+    
+    # Send the request and parse content
+    content = requests.get(search_engine, headers=headers, params=parameters).text
+    soup = BeautifulSoup(content, 'html.parser')
+    
+    # Attempt to find search results
+    search_results = soup.find_all('div', class_='tF2Cxc')  # Common class for search results
+    
+    
+    # Check if any results are found
+    if search_results:
+        # Get up to 5 results
+        for index, result in enumerate(search_results[:5]):
+            # Find the link in each result
+            link = result.find('a')
+            
+            # Print the result number and the link
+            if link and link['href']:
+                print(f"Result {index + 1}: {link['href']}")
+            else:
+                print(f"Result {index + 1}: No valid link found.")
+                
+            response = requests.get(link['href'], headers=headers, params=parameters, proxies=proxies)
+    
+            content = response.text
+            
+            soup = BeautifulSoup(content, 'html.parser')
+    
+    # Extract relevant text from paragraphs, headings, or divs with content
+            important_text = []
+            
+    # Extracting <p> (paragraph) tags
+            for paragraph in soup.find_all('p'):
+                important_text.append(paragraph.get_text())
+    
+    # Optionally extracting headings like h1-h6
+            for heading in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
+                important_text.append(heading.get_text())
+            
+            # Get the first 10 important points and convert them to string form
+            first_10_points = important_text[:10]  # Get the first 10 points
+            formatted_string = '\n'.join([f"{i + 1}. {point}" for i, point in enumerate(first_10_points)])
+    
+            # Print the formatted string of first 10 important points
+            print(f"{formatted_string}\n")
+    
+            # Save the scraped content to a text file
+            filename = f"important_text_{idx+1}.txt"
+            save_text_to_file(formatted_string, filename)
+        
+    else:
+        print("No search results found.")
+
+
+import requests
+import json
+
+'''
+generate audio
+'''
+
+# Function to get the list of available voices
+def get_voices(api_key, text):
+    url = "https://api.elevenlabs.io/v1/voices"
+    # text = formatted_string
+    headers = {
+        'xi-api-key': 'sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6',
+        'accept': 'application/json'
+    }
+    
+    response = requests.get(url, headers=headers)
+    print(response)
+    if response.status_code == 200:
+        voices = response.json()
+        return voices['voices']
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
+        return None
+
+# Function to convert text to speech using Eleven Labs API
+def text_to_speech(text, api_key, voice_id):
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+    #text = text[:1000]
+    headers = {
+        'xi-api-key': 'sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6',
+        'Content-Type': 'application/json'
+    }
+
+    data = {
+        "text": text,
+        "model_id": "eleven_monolingual_v1",  # Optional, default model
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 200:
+        # Save the audio file locally
+        with open("/Users/lavanyadalinannappa/Desktop/output2.mp3", "wb") as f:
+            f.write(response.content)
+        print("Audio has been saved successfully!")
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
+
+# Your Eleven Labs API key
+api_key = "sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6"
+
+def generate_audio(text, api_key, voice_id=0):
+
+    # Get available voices
+    voices = get_voices(api_key, text)
+    
+    if voices:
+        for voice in voices:
+            print(f"Voice: {voice['name']}, ID: {voice['voice_id']}")
+    
+        # Use the first voice for the demo
+        selected_voice_id = voices[voice_id]['voice_id']
+        
+        # Convert text to audio
+        text_to_speech(text, api_key, selected_voice_id)
+
+    else:
+        print('could not generate audio')
+
+
+# if voices:
+#     for voice in voices:
+#         print(f"Voice: {voice['name']}, ID: {voice['voice_id']}")
+
+#     # Use the first voice for the demo
+#     selected_voice_id = voices[4]['voice_id']
+
+#     # Scraped text (example)
+#     #scraped_text = "Your scraped content here that you want to convert into speech."
+
+#     # Convert text to audio
+#     text_to_speech(formatted_string, api_key, selected_voice_id)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3001)
