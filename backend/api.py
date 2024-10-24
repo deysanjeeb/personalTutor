@@ -28,10 +28,10 @@ app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
 AUDIO_DIRECTORY = 'audio_gen'
 
-SUPABASE_URL = "https://vekvqpujgqmtyyiuoaex.supabase.co"  # Your Supabase project URL
-SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZla3ZxcHVqZ3FtdHl5aXVvYWV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTQxMjMyNCwiZXhwIjoyMDQ0OTg4MzI0fQ.cmyLRmELYFBj-eSs5MWPuxiBSflywgQpK9GjlW9GhFI'
-STORAGE_BUCKET = 'store'  # Replace with your Supabase storage bucket name
-imageURL='https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/elsa.webp'
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_API_KEY = os.getenv('SUPABASE_API_KEY')
+STORAGE_BUCKET = os.getenv('STORAGE_BUCKET')
+imageURL=os.getenv('imageURL')
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 os.makedirs(AUDIO_DIRECTORY, exist_ok=True)
@@ -629,3 +629,6 @@ def upload_file(file_path: str, bucket_name: str, file_name: str = None):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3001)
+
+
+hey
