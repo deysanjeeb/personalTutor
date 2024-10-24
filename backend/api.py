@@ -591,13 +591,7 @@ def genVid(data):
     return(stat['video_url'])
 
 
-# Load environment variables
-load_dotenv()
-
-# Initialize Supabase client
-url: str = "https://vekvqpujgqmtyyiuoaex.supabase.co"
-key: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZla3ZxcHVqZ3FtdHl5aXVvYWV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTQxMjMyNCwiZXhwIjoyMDQ0OTg4MzI0fQ.cmyLRmELYFBj-eSs5MWPuxiBSflywgQpK9GjlW9GhFI'
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY)
 
 def upload_file(file_path: str, bucket_name: str, file_name: str = None):
     """
@@ -629,6 +623,3 @@ def upload_file(file_path: str, bucket_name: str, file_name: str = None):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3001)
-
-
-hey
