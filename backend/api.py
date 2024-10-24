@@ -13,6 +13,9 @@ import chromadb
 import re
 import ollama
 import requests
+from bs4 import BeautifulSoup
+from datetime import datetime as dt
+from supabase import create_client, Client
 
 load_dotenv()
 api_key = os.getenv('GROQ_API_KEY')
@@ -20,12 +23,18 @@ vectara_api = os.getenv('VECTARA_API_KEY')
 vectara_corpus_id = os.getenv('VECTARA_CORPUS_ID')
 vectara_customer_id = os.getenv('VECTARA_CUSTOMER_ID')
 infinity_api = os.getenv('INFINITY_API_KEY')
+eleven_api = os.getenv('ELEVEN_API')
 app = FastAPI()
 UPLOAD_DIRECTORY = "uploaded_pdfs"
+AUDIO_DIRECTORY = 'audio_gen'
 
-
+SUPABASE_URL = "https://vekvqpujgqmtyyiuoaex.supabase.co"  # Your Supabase project URL
+SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZla3ZxcHVqZ3FtdHl5aXVvYWV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTQxMjMyNCwiZXhwIjoyMDQ0OTg4MzI0fQ.cmyLRmELYFBj-eSs5MWPuxiBSflywgQpK9GjlW9GhFI'
+STORAGE_BUCKET = 'store'  # Replace with your Supabase storage bucket name
+imageURL='https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/elsa.webp'
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+os.makedirs(AUDIO_DIRECTORY, exist_ok=True)
 
 # Configure CORS
 app.add_middleware(
@@ -306,54 +315,53 @@ async def upload_pdf_file(file: UploadFile = File(...)):
     # return response
 
 
-@app.get("/vidGen")
-# async def vidGen(request: urls):
-async def vidGen():
-    url = "https://studio.infinity.ai/api/v2/generate"
-    headers = {
-        "accept": "application/json",
-        "authorization": f"Bearer {infinity_api}",
-        "content-type": "application/json"
-    }
-    print(headers)
-    data = {
-        "resolution": "320",
-        "crop_head": False,
-        "make_stable": False,
-        "img_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/infantBaby.png",
-        "audio_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/10sec.wav"
-    }
-    response = requests.post(url, headers=headers, json=data)
-    print(response.json())
-
-
-# @app.post("/vidGen")
-# async def vidGen(request: urls):
+# @app.get("/vidGen")
+# # async def vidGen(request: urls):
+# async def vidGen():
 #     url = "https://studio.infinity.ai/api/v2/generate"
 #     headers = {
 #         "accept": "application/json",
 #         "authorization": f"Bearer {infinity_api}",
 #         "content-type": "application/json"
 #     }
+#     print(headers)
 #     data = {
 #         "resolution": "320",
 #         "crop_head": False,
 #         "make_stable": False,
-#         "img_url": request.imgURL,
-#         "audio_url": request.audioURL
+#         "img_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/infantBaby.png",
+#         "audio_url": "https://vekvqpujgqmtyyiuoaex.supabase.co/storage/v1/object/public/store/10sec.wav"
 #     }
 #     response = requests.post(url, headers=headers, json=data)
 #     print(response.json())
 
-@app.get("/vidStat")
-async def vidStat():
-    url = "https://studio.infinity.ai/api/v2/generations/116facc9-0366-4ec3-9d46-76c96c7de397"
+
+# @app.post("/vidGen")
+def vidGen(audioURL,imgURL):
+    url = "https://studio.infinity.ai/api/v2/generate"
+    headers = {
+        "accept": "application/json",
+        "authorization": f"Bearer {infinity_api}",
+        "content-type": "application/json"
+    }
+    data = {
+        "resolution": "320",
+        "crop_head": False,
+        "make_stable": False,
+        "img_url": imgURL,
+        "audio_url": audioURL
+    }
+    response = requests.post(url, headers=headers, json=data)
+    return(response.json())
+
+def vidStat(id):
+    url = f"https://studio.infinity.ai/api/v2/generations/{id}"
     headers = {
         "authorization": f"Bearer {infinity_api}"
     }
 
     response = requests.get(url, headers=headers)
-    print(response.json())
+    return(response.json())
 
 
 @app.post("/query")
@@ -398,7 +406,10 @@ async def query(chat_request: ChatRequest):
         # Parse the JSON response
         data = response.json()
         print(json.dumps(data, indent=2))
-        return data
+        if isVid:
+            genVid(data)
+        else:
+            return data
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
@@ -406,9 +417,7 @@ async def query(chat_request: ChatRequest):
 
 #LAVANYA - PHASE_2
 
-from bs4 import BeautifulSoup
-import requests
-import os
+
 
 '''
 Getting references
@@ -490,8 +499,6 @@ def get_references(query, search_engine, proxies):
         print("No search results found.")
 
 
-import requests
-import json
 
 '''
 generate audio
@@ -502,7 +509,7 @@ def get_voices(api_key, text):
     url = "https://api.elevenlabs.io/v1/voices"
     # text = formatted_string
     headers = {
-        'xi-api-key': 'sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6',
+        'xi-api-key': eleven_api,
         'accept': 'application/json'
     }
     
@@ -520,7 +527,7 @@ def text_to_speech(text, api_key, voice_id):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     #text = text[:1000]
     headers = {
-        'xi-api-key': 'sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6',
+        'xi-api-key': eleven_api,
         'Content-Type': 'application/json'
     }
 
@@ -537,14 +544,19 @@ def text_to_speech(text, api_key, voice_id):
 
     if response.status_code == 200:
         # Save the audio file locally
-        with open("/Users/lavanyadalinannappa/Desktop/output2.mp3", "wb") as f:
+        timestamp = dt.now().strftime("%Y%m%d%H%M%S")
+        file_loc = os.path.join(AUDIO_DIRECTORY,f'{timestamp}.mp3')
+        with open(file_loc, "wb") as f:
             f.write(response.content)
         print("Audio has been saved successfully!")
+        public_url = upload_file(file_loc, 'store')
+        if public_url:
+            print(f"Public URL: {public_url}")
+        return public_url
     else:
         print(f"Error: {response.status_code}, {response.text}")
 
-# Your Eleven Labs API key
-api_key = "sk_9abac15db603c850879e3a568abf4543fcd32140f62ed8c6"
+
 
 def generate_audio(text, api_key, voice_id=0):
 
@@ -559,24 +571,60 @@ def generate_audio(text, api_key, voice_id=0):
         selected_voice_id = voices[voice_id]['voice_id']
         
         # Convert text to audio
-        text_to_speech(text, api_key, selected_voice_id)
+        audioURL = text_to_speech(text, api_key, selected_voice_id)
+        return audioURL
+
 
     else:
         print('could not generate audio')
 
+def genVid(data):
+    print(data['summary'])
+    audioURL = generate_audio(data['summary'], eleven_api, 0)
+    res=vidGen(audioURL,imageURL)
+    success='pending'
+    while success=='pending':
+        stat = vidStat(res['job_id'])
+        success=stat['status']
+        sleep(10)
+    print(stat['video_url'])
+    return(stat['video_url'])
 
-# if voices:
-#     for voice in voices:
-#         print(f"Voice: {voice['name']}, ID: {voice['voice_id']}")
 
-#     # Use the first voice for the demo
-#     selected_voice_id = voices[4]['voice_id']
+# Load environment variables
+load_dotenv()
 
-#     # Scraped text (example)
-#     #scraped_text = "Your scraped content here that you want to convert into speech."
+# Initialize Supabase client
+url: str = "https://vekvqpujgqmtyyiuoaex.supabase.co"
+key: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZla3ZxcHVqZ3FtdHl5aXVvYWV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTQxMjMyNCwiZXhwIjoyMDQ0OTg4MzI0fQ.cmyLRmELYFBj-eSs5MWPuxiBSflywgQpK9GjlW9GhFI'
+supabase: Client = create_client(url, key)
 
-#     # Convert text to audio
-#     text_to_speech(formatted_string, api_key, selected_voice_id)
+def upload_file(file_path: str, bucket_name: str, file_name: str = None):
+    """
+    Upload a file to Supabase Storage.
+    
+    :param file_path: Path to the file to be uploaded
+    :param bucket_name: Name of the bucket to upload to
+    :param file_name: Name to give the file in storage (optional)
+    :return: URL of the uploaded file
+    """
+    if not file_name:
+        file_name = os.path.basename(file_path)
+    
+    with open(file_path, 'rb') as file:
+        response = supabase.storage.from_(bucket_name).upload(file_name, file)
+    
+    if response.status_code == 200:
+        print(f"File uploaded successfully: {file_name}")
+        public_url = supabase.storage.from_(bucket_name).get_public_url(file_name)
+        return public_url
+    else:
+        print(f"Error uploading file: {response.content}")
+        return None
+
+
+    
+    
 
 if __name__ == "__main__":
     import uvicorn
