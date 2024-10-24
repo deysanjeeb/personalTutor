@@ -159,7 +159,7 @@ const ChatInterface = () => {
             <div ref={messagesEndRef} />
         </div>
         <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200">
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
             <input
                 type="text"
                 value={input}
@@ -167,21 +167,22 @@ const ChatInterface = () => {
                 placeholder="Type your message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={(e) => setIsChecked(e.target.checked)}
-            className="mr-2"
-          />
+            <label className="flex items-center space-x-2">
+              <span>Generate Video</span>
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
+                className="mr-2"
+              />
+            </label>
             <button
-  type="submit"
-  disabled={isLoading}
-  className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
->
-<Send size={24} />
-</button>
-
-
+              type="submit"
+              disabled={isLoading}
+              className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              <Send size={24} />
+            </button>
             </div>
         </form>
     </div>
