@@ -54,6 +54,17 @@ This FastAPI-based service is designed to handle PDF file uploads, extract conte
     ```bash
     GROQ_API_KEY=<your_groq_api_key>
     OLLAMA_API_KEY=<your_ollama_api_key>
+    OPENAI_API_KEY = ''
+    GROQ_API_KEY = ‘’
+    VECTARA_API_KEY=''
+    VECTARA_CORPUS_ID=''
+    VECTARA_CUS_ID=''
+    INFINITY_API_KEY=''
+    ELEVEN_API=''
+    SUPABASE_URL = ""  
+    SUPABASE_API_KEY = ''
+    STORAGE_BUCKET = ''  
+    imageURL=''
     ```
 
 3. Install [https://ollama.com/download](https://ollama.com/download)
