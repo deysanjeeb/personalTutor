@@ -23,7 +23,8 @@ const ChatInterface = () => {
     setMessages([defaultMessage]);
   }, []);
 
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async (option, e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -38,7 +39,41 @@ const ChatInterface = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input,isChecked: isChecked }),
+        body: JSON.stringify({ message: input,isChecked: option }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      const botMessage = { text: data.summary, sender: 'bot' };
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = { text: 'Sorry, there was an error processing your request.', sender: 'bot' };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVidSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage = { text: input, sender: 'user' };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://0.0.0.0:3001/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input,isChecked: true }),
       });
 
       if (!response.ok) {
@@ -174,7 +209,7 @@ const ChatInterface = () => {
                 placeholder="Type your message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <label className="flex items-center space-x-2">
+            {/* <label className="flex items-center space-x-2">
               <span>Generate Video</span>
               <input
                 type="checkbox"
@@ -182,9 +217,18 @@ const ChatInterface = () => {
                 onChange={(e) => setIsChecked(e.target.checked)}
                 className="mr-2"
               />
-            </label>
+            </label> */}
             <button
               type="submit"
+              onClick={(e) => handleSubmit('true', e)}
+              disabled={isLoading}
+              className="mr-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Video
+            </button>
+            <button
+              type="submit"
+              onClick={(e) => handleSubmit('false', e)}
               disabled={isLoading}
               className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
