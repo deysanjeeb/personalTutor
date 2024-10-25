@@ -15,9 +15,13 @@ const ChatInterface = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  
-
   useEffect(scrollToBottom, [messages]);
+
+  useEffect(() => {
+    // Add a default message from the bot when the component mounts
+    const defaultMessage = { text: 'Hi! Lets start by uploading a PDF', sender: 'bot' };
+    setMessages([defaultMessage]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
