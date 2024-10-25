@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+#drop-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.highlight {
+    border-color: #333;
+}
+
+#chat-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 20px 0;
+    height: 200px;
+    overflow-y: scroll;
+}
+
+input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    margin-right: 10px;
+}
