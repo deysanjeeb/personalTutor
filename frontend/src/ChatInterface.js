@@ -10,18 +10,38 @@ const ChatInterface = () => {
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const [isChecked, setIsChecked] = useState(false);
-
+  const [loadingText, setLoadingText] = useState('Thinking');
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  useEffect(scrollToBottom, [messages]);
+    useEffect(scrollToBottom, [messages]);
 
   useEffect(() => {
     // Add a default message from the bot when the component mounts
     const defaultMessage = { text: 'Hi! Lets start by uploading a PDF', sender: 'bot' };
     setMessages([defaultMessage]);
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (isLoading) {
+      const updateLoadingText = async () => {
+        setLoadingText("generating audio");
+        
+        await delay(5000); // Delay for 5000 milliseconds (5 seconds)
+        setLoadingText("generating video using infinity ai");
+        interval = setInterval(() => {
+          setLoadingText(prev => prev + '.');
+        }, 1000); // Update text every 500ms
+      };
+      updateLoadingText();
+    } else {
+      setLoadingText('Thinking');
+    }
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
 
   const handleSubmit = async (option, e) => {
@@ -40,40 +60,6 @@ const ChatInterface = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ message: input,isChecked: option }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      const botMessage = { text: data.summary, sender: 'bot' };
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error('Error:', error);
-      const errorMessage = { text: 'Sorry, there was an error processing your request.', sender: 'bot' };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVidSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMessage = { text: input, sender: 'user' };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('http://0.0.0.0:3001/query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: input,isChecked: true }),
       });
 
       if (!response.ok) {
@@ -192,12 +178,12 @@ const ChatInterface = () => {
             </div>
             ))}
             {isLoading && (
-            <div className="flex justify-start">
-                <div className="w-fit max-w-[75%] p-3 rounded-lg bg-gray-200 text-gray-800">
-                <p className="text-sm sm:text-base">Thinking...</p>
-                </div>
-            </div>
-            )}
+  <div className="flex justify-start">
+    <div className="w-fit max-w-[75%] p-3 rounded-lg bg-gray-200 text-gray-800">
+      <p className="text-sm sm:text-base">{loadingText}</p>
+    </div>
+  </div>
+)}
             <div ref={messagesEndRef} />
         </div>
         <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200">
@@ -209,15 +195,7 @@ const ChatInterface = () => {
                 placeholder="Type your message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {/* <label className="flex items-center space-x-2">
-              <span>Generate Video</span>
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                className="mr-2"
-              />
-            </label> */}
+            
             <button
               type="submit"
               onClick={(e) => handleSubmit('true', e)}
