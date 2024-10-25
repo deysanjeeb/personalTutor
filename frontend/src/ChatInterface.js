@@ -96,8 +96,11 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-screen w-4/5 mx-auto">
-        <div className="flex justify-end p-4 border-b border-gray-200">
-        <form onSubmit={handlePdfUpload} className="flex space-x-2">
+      <div className="flex justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center">
+          <p className="text-left">TeachU</p>
+        </div>
+          <form onSubmit={handlePdfUpload} className="flex space-x-2">
           <button
             type="button"
             onClick={handleFileUploadClick}
