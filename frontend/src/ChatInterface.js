@@ -6,11 +6,12 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isVideo, setIsVideo] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const [isChecked, setIsChecked] = useState(false);
   const [loadingText, setLoadingText] = useState('Thinking');
+  const [videoText, setVideoText] = useState('');
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -26,23 +27,37 @@ const ChatInterface = () => {
 
   useEffect(() => {
     let interval;
-    if (isLoading) {
-      const updateLoadingText = async () => {
-        setLoadingText("generating audio");
+    if (isVideo) {
+      const updateVideoText = async () => {
+        setVideoText("Generating Audio");
         
         await delay(5000); // Delay for 5000 milliseconds (5 seconds)
-        setLoadingText("generating video using infinity ai");
+        setVideoText("Generating Video using Infinity AI");
+        interval = setInterval(() => {
+          setLoadingText(prev => prev + '.');
+        }, 1000); // Update text every 500ms
+      };
+      updateVideoText();
+    } else {
+      setVideoText('Thinking');
+    }
+    return () => clearInterval(interval);
+  }, [isVideo]);
+
+  useEffect(() => {
+    let interval;
+    if (isLoading) {
+      const updateLoadingText = async () => {
         interval = setInterval(() => {
           setLoadingText(prev => prev + '.');
         }, 1000); // Update text every 500ms
       };
       updateLoadingText();
     } else {
-      setLoadingText('Thinking');
+      setLoadingText('Uploading');
     }
     return () => clearInterval(interval);
   }, [isLoading]);
-
 
   const handleSubmit = async (option, e) => {
     e.preventDefault();
@@ -51,7 +66,7 @@ const ChatInterface = () => {
     const userMessage = { text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
+    setIsVideo(true);
 
     try {
       const response = await fetch('http://0.0.0.0:3001/query', {
@@ -74,7 +89,7 @@ const ChatInterface = () => {
       const errorMessage = { text: 'Sorry, there was an error processing your request.', sender: 'bot' };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false);
+      setIsVideo(false);
     }
   };
 
@@ -178,9 +193,16 @@ const ChatInterface = () => {
             </div>
             ))}
             {isLoading && (
+            <div className="flex justify-start">
+                <div className="w-fit max-w-[75%] p-3 rounded-lg bg-gray-200 text-gray-800">
+                <p className="text-sm sm:text-base">{loadingText}</p>
+                </div>
+            </div>
+            )}
+            {isVideo && (
   <div className="flex justify-start">
     <div className="w-fit max-w-[75%] p-3 rounded-lg bg-gray-200 text-gray-800">
-      <p className="text-sm sm:text-base">{loadingText}</p>
+      <p className="text-sm sm:text-base">{videoText}</p>
     </div>
   </div>
 )}
