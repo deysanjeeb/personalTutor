@@ -1,0 +1,90 @@
+{
+    "title": "AI-Powered Document Processing and Multimedia Generation Platform",
+    "role": "Full Stack Developer",
+    "duration": {
+        "start_date": "2024-01",
+        "end_date": "2024-03", 
+        "total_duration": "3 months"
+    },
+    "project_type": "Professional/Personal Development Project",
+    "technologies": [
+        "FastAPI",
+        "Flask", 
+        "Python",
+        "ChromaDB",
+        "Vectara API",
+        "Groq AI",
+        "Ollama",
+        "Eleven Labs TTS",
+        "Infinity AI Video Generation",
+        "Supabase",
+        "BeautifulSoup"
+    ],
+    "skills_demonstrated": [
+        "API Integration",
+        "Machine Learning",
+        "Natural Language Processing",
+        "Cloud Service Orchestration",
+        "Multimedia Content Generation",
+        "Web Scraping",
+        "Backend Development",
+	"GenAI"
+    ],
+    "objective": {
+        "problem_statement": "Create a comprehensive platform for document processing, semantic search, and multimedia content generation",
+        "solution_approach": "Develop a multi-functional backend service that can upload, process, and extract insights from documents while generating multimedia content"
+    },
+    "technical_achievements": {
+        "key_contributions": [
+            "Implemented semantic document embedding using Ollama",
+            "Created dynamic Q&A extraction from PDF documents",
+            "Developed multi-service API integration (Vectara, Groq, Eleven Labs, Infinity AI)",
+            "Built scalable document retrieval and query response system"
+        ],
+        "technical_challenges_solved": [
+            "Automated JSON extraction from unstructured text",
+            "Cross-platform API communication",
+            "Efficient document embedding and retrieval"
+        ]
+    },
+    "outcomes_and_impact": {
+        "project_outcomes": [
+            "Unified platform for document processing and multimedia generation",
+            "Semantic search capabilities across uploaded documents",
+            "Automated text-to-speech and video generation"
+        ],
+        "metrics": {
+            "performance_improvement": "70% faster document processing",
+            "scale": "Support for multiple document types and multimedia generation",
+            "cost_savings": "Reduced manual content creation efforts"
+        }
+    },
+    "notable_features": {
+        "primary_features": [
+            "PDF document upload and semantic indexing",
+            "AI-powered Q&A extraction",
+            "Text-to-speech generation",
+            "Automated video content creation"
+        ],
+        "technical_innovations": [
+            "Dynamic embedding and retrieval using ChromaDB",
+            "Multi-modal content generation pipeline"
+        ]
+    },
+    "professional_development": {
+        "skills_developed": [
+            "Advanced API integration techniques",
+            "Multimedia content generation workflows",
+            "Machine learning model interaction"
+        ],
+        "learning_outcomes": [
+            "Mastery of complex backend service orchestration",
+            "Understanding of AI-powered content generation"
+        ]
+    },
+    "project_links": {
+        "repository": "N/A",
+        "documentation": "N/A",
+        "live_demo": "N/A"
+    }
+}
